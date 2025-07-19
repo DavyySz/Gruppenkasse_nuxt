@@ -76,6 +76,33 @@ app.get('/secure-dashboard', (req, res) => {
   })
 })
 
+// ==== 📤 BENUTZERDATEN LADEN ==== //
+// Frontend sendet Email → Server antwortet mit den dazugehörigen Werten
+app.post('/userdata', (req, res) => {
+  const { email } = req.body
+
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'E-Mail fehlt' })
+  }
+
+  const sql = `
+    SELECT email, gruppenfahrt_2025, gruppenkasse_2025
+    FROM users
+    WHERE email = ?
+  `
+  db.get(sql, [email], (err, row) => {
+    if (err) {
+      console.error('❌ DB-Fehler bei /userdata:', err.message)
+      return res.status(500).json({ success: false, message: 'Interner Fehler' })
+    }
+
+    if (row) {
+      res.json({ success: true, data: row })
+    } else {
+      res.status(404).json({ success: false, message: 'Nutzer nicht gefunden' })
+    }
+  })
+})
 
 // ==== 🟢 Server starten ==== //
 app.listen(port, () => {
