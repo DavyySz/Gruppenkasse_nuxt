@@ -2,21 +2,29 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const https = require('https');
 const fs = require('fs');
+const path = require('path');
+const https = require('https');
 const http = require('http');
 
-// Initialisiere Express
+// Express-App initialisieren
 const app = express();
-const port = 8080; // HTTP Port für Weiterleitungen
-const securePort = 443; // HTTPS Port
+const port = 8080;     // HTTP-Port
+const securePort = 443; // HTTPS-Port
+
+// SSL-Zertifikate
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/gruppetews.ddns.net/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/gruppetews.ddns.net/fullchain.pem')
+};
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(__dirname));  // Dient dashboard.html aus dem aktuellen Verzeichnis aus
 
-// Datenbankpfad
-const db = new sqlite3.Database('/home/daniel/datenbank_gruppenkasse/gruppenkasse.db', (err) => {
+// Datenbank verbinden
+const db = new sqlite3.Database('./gruppenkasse.db', (err) => {
   if (err) {
     console.error('❌ Fehler beim Öffnen der Datenbank:', err.message);
   } else {
@@ -24,7 +32,7 @@ const db = new sqlite3.Database('/home/daniel/datenbank_gruppenkasse/gruppenkass
   }
 });
 
-// Beispiel Login-Endpoint
+// Login-Endpoint
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -47,21 +55,18 @@ app.post('/login', (req, res) => {
   });
 });
 
-// Endpoint für das gesicherte Dashboard (mit dynamischen Benutzerdaten)
+// Gesichertes Dashboard
 app.get('/secure-dashboard', (req, res) => {
   const authHeader = req.headers['authorization'];
-
   if (authHeader !== 'Bearer geheim123') {
     return res.status(403).send('Nicht erlaubt – Kein gültiger Zugriffsschlüssel');
   }
 
-  const email = req.query.email;  // Die E-Mail, die beim Login verwendet wurde
-
+  const email = req.query.email;
   if (!email) {
     return res.status(400).send('E-Mail fehlt');
   }
 
-  // Hole die Benutzerdaten aus der Datenbank
   const sql = 'SELECT email, gruppenfahrt_2025, gruppenkasse_2025 FROM users WHERE email = ?';
   db.get(sql, [email], (err, row) => {
     if (err) {
@@ -70,36 +75,32 @@ app.get('/secure-dashboard', (req, res) => {
     }
 
     if (row) {
-      // Ersetze Platzhalter im HTML mit den Benutzerdaten
-      const dashboardHtml = `
-        <html>
-        <head><title>Dashboard</title></head>
-        <body>
-          <h1>Willkommen, ${row.email}</h1>
-          <p>Gruppenfahrt 2025: ${row.gruppenfahrt_2025} €</p>
-          <p>Gruppenkasse 2025: ${row.gruppenkasse_2025} €</p>
-        </body>
-        </html>
-      `;
-      res.send(dashboardHtml);  // Dynamisches HTML zurücksenden
+      fs.readFile(path.join(__dirname, 'dashboard.html'), 'utf8', (err, html) => {
+        if (err) {
+          console.error('❌ Fehler beim Lesen von dashboard.html:', err.message);
+          return res.status(500).send('Fehler beim Laden des Dashboards');
+        }
+
+        // Platzhalter ersetzen
+        html = html
+          .replace('{{email}}', row.email)
+          .replace('{{gruppenfahrt}}', row.gruppenfahrt_2025)
+          .replace('{{gruppenkasse}}', row.gruppenkasse_2025);
+
+        res.send(html);
+      });
     } else {
       res.status(404).send('Benutzer nicht gefunden');
     }
   });
 });
 
-// Starte HTTP-Server (Port 80 für Weiterleitung)
+// HTTP starten
 http.createServer(app).listen(port, () => {
   console.log(`🚀 HTTP-Server läuft auf http://localhost:${port}`);
 });
 
-// Lade SSL-Zertifikat und Schlüssel für HTTPS
-const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/gruppetews.ddns.net/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/gruppetews.ddns.net/fullchain.pem'),
-};
-
-// Starte HTTPS-Server
+// HTTPS starten
 https.createServer(options, app).listen(securePort, () => {
   console.log(`🚀 HTTPS-Server läuft auf https://gruppetews.ddns.net`);
 });

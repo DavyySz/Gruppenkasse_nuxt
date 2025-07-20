@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
   <style>
     body {
@@ -28,7 +28,7 @@
 
     h1 {
       font-size: 2.8rem;
-      color: #4CAF50; 
+      color: #4CAF50;
       margin-bottom: 20px;
       font-weight: 600;
     }
@@ -65,36 +65,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>Willkommen, <span id="email"></span></h1>
-    <p><strong>Gruppenfahrt 2025:</strong> <span id="gruppenfahrt"></span> €</p>
-    <p><strong>Gruppenkasse 2025:</strong> <span id="gruppenkasse"></span> €</p>
+    <h1>Willkommen, {{email}}</h1>
+    <p><strong>Gruppenfahrt 2025:</strong> {{gruppenfahrt}} €</p>
+    <p><strong>Gruppenkasse 2025:</strong> {{gruppenkasse}} €</p>
     <button class="button" onclick="window.location.reload();">Seite neu laden</button>
   </div>
-
-  <script>
-    // Holen der E-Mail aus dem localStorage
-    const email = localStorage.getItem('email');
-    
-    if (email) {
-      // Anfrage an das Backend senden, um die Daten zu laden
-      fetch(`https://gruppetews.ddns.net:8080/secure-dashboard?email=${email}`, {
-        headers: {
-          'Authorization': 'Bearer geheim123'
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        // Dynamisch die Daten ins HTML einfügen
-        document.getElementById('email').textContent = data.email;
-        document.getElementById('gruppenfahrt').textContent = data.gruppenfahrt_2025;
-        document.getElementById('gruppenkasse').textContent = data.gruppenkasse_2025;
-      })
-      .catch(err => {
-        console.error('Fehler beim Laden der Daten:', err);
-      });
-    } else {
-      console.log('Kein Nutzer eingeloggt');
-    }
-  </script>
 </body>
 </html>
