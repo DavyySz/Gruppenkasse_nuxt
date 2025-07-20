@@ -4,11 +4,97 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7fc;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 650px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      color: #4CAF50; 
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #333;
+      margin-bottom: 12px;
+      font-weight: 400;
+    }
+
+    strong {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+
+    .button {
+      margin-top: 30px;
+      padding: 12px 25px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-  <h1>Willkommen auf deinem Dashboard</h1>
-  <p><strong>E-Mail:</strong> {{email}}</p>
-  <p><strong>Gruppenkasse 2025:</strong> {{gruppenkasse_2025}} €</p>
-  <p><strong>Gruppenfahrt 2025:</strong> {{gruppenfahrt_2025}} €</p>
+  <div class="container">
+    <h1>Willkommen, <span id="email"></span></h1>
+    <p><strong>Gruppenfahrt 2025:</strong> <span id="gruppenfahrt"></span> €</p>
+    <p><strong>Gruppenkasse 2025:</strong> <span id="gruppenkasse"></span> €</p>
+    <button class="button" onclick="window.location.reload();">Seite neu laden</button>
+  </div>
+
+  <script>
+    // Holen der E-Mail aus dem localStorage
+    const email = localStorage.getItem('email');
+    
+    if (email) {
+      // Anfrage an das Backend senden, um die Daten zu laden
+      fetch(`https://gruppetews.ddns.net:8080/secure-dashboard?email=${email}`, {
+        headers: {
+          'Authorization': 'Bearer geheim123'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Dynamisch die Daten ins HTML einfügen
+        document.getElementById('email').textContent = data.email;
+        document.getElementById('gruppenfahrt').textContent = data.gruppenfahrt_2025;
+        document.getElementById('gruppenkasse').textContent = data.gruppenkasse_2025;
+      })
+      .catch(err => {
+        console.error('Fehler beim Laden der Daten:', err);
+      });
+    } else {
+      console.log('Kein Nutzer eingeloggt');
+    }
+  </script>
 </body>
 </html>
