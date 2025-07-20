@@ -42,64 +42,56 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-// Reaktive Variablen für das Login-Formular
-const email = ref('')
-const password = ref('')
-const error = ref('')
+const email = ref('');
+const password = ref('');
+const error = ref('');
 
-// Funktion wird beim Absenden des Formulars aufgerufen
 const handleSubmit = async () => {
-  error.value = '' // Fehleranzeige zurücksetzen
+  error.value = '';
 
   if (!email.value || !password.value) {
-    error.value = 'Bitte alle Felder ausfüllen.'
-    return
+    error.value = 'Bitte alle Felder ausfüllen.';
+    return;
   }
 
   try {
-    // Login-Anfrage an den Node.js-Server senden
+    // Login-Anfrage an den Backend-Server
     const res = await fetch('http://gruppetews.ddns.net:8080/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         email: email.value,
-        password: password.value
-      })
-    })
+        password: password.value,
+      }),
+    });
 
-    const data = await res.json()
+    const data = await res.json();
 
     if (data.success) {
-      alert('Login erfolgreich!')
+      alert('Login erfolgreich!');
+      localStorage.setItem('email', email.value);
 
-      // Speichere die E-Mail im localStorage (für späteren Abruf im Dashboard)
-      localStorage.setItem('email', email.value)
-
-      // Lade die geschützte HTML-Seite mit dem geheimen Token
+      // Anfrage für das Dashboard
       const dashboardResponse = await fetch('http://gruppetews.ddns.net:8080/secure-dashboard', {
         headers: {
-          Authorization: 'Bearer geheim123'
-        }
-      })
+          Authorization: 'Bearer geheim123',
+        },
+      });
 
-      const html = await dashboardResponse.text()
-
-      // Öffne das Dashboard in einem neuen Tab/Fenster
-      const win = window.open('', '_blank')
-      win.document.write(html)
-      win.document.close()
+      const html = await dashboardResponse.text();
+      const win = window.open('', '_blank');
+      win.document.write(html);
+      win.document.close();
     } else {
-      error.value = data.message || 'Falsche Zugangsdaten.'
+      error.value = data.message || 'Falsche Zugangsdaten.';
     }
   } catch (err) {
-    error.value = 'Server nicht erreichbar.'
-    console.error(err)
+    error.value = 'Server nicht erreichbar.';
+    console.error(err);
   }
-}
+};
 </script>
-
-
