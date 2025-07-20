@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 80%;
+      max-width: 1000px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    input {
+      padding: 5px;
+      width: 80px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Admin Dashboard</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Gruppenkasse 2025</th>
+          <th>Gruppenfahrt 2025</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{users}}
+      </tbody>
+    </table>
+
+    <button onclick="updateData()">Daten aktualisieren</button>
+  </div>
+
+  <script>
+    // Update die Daten in der Datenbank
+    function updateData() {
+      const updates = [];
+      const rows = document.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const email = row.querySelector('td:nth-child(1)').textContent;
+        const gruppenkasse = row.querySelector('input[id^="gruppenkasse_"]').value;
+        const gruppenfahrt = row.querySelector('input[id^="gruppenfahrt_"]').value;
+        
+        const id = row.querySelector('input').id.split('_')[1];
+
+        if (email) {
+          updates.push({
+            id,
+            gruppenkasse_2025: gruppenkasse,
+            gruppenfahrt_2025: gruppenfahrt
+          });
+        }
+      });
+
+      fetch('/admin-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Daten erfolgreich aktualisiert!');
+        }
+      })
+      .catch(error => {
+        console.error('Fehler beim Aktualisieren der Daten:', error);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -2,95 +2,37 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f4f8;
-      margin: 0;
-      padding: 0;
+      font-family: sans-serif;
+      background: #f4f4f4;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
-
     .card {
       background: white;
-      padding: 40px 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      width: 100%;
-      max-width: 600px;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       text-align: center;
     }
-
+    .card p {
+      font-size: 18px;
+      margin: 10px 0;
+    }
     h1 {
-      font-size: 2rem;
-      color: #2e7d32;
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
-
-    .email {
-      font-size: 1.1rem;
-      color: #555;
-      margin-bottom: 25px;
-      font-weight: 500;
-      word-break: break-word;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      font-size: 1.1rem;
-      border-bottom: 1px solid #eee;
-      color: #444;
-    }
-
-    .info-row strong {
-      color: #2e7d32;
-    }
-
-    .button {
-      margin-top: 35px;
-      padding: 12px 24px;
-      background-color: #2e7d32;
-      color: white;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .button:hover {
-      background-color: #27662b;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Willkommen</h1>
-    <div class="email">{{email}}</div>
-    
-    <div class="info-row">
-      <strong>Gruppenfahrt 2025:</strong>
-      <span>{{gruppenfahrt}} €</span>
-    </div>
-
-    <div class="info-row">
-      <strong>Gruppenkasse 2025:</strong>
-      <span>{{gruppenkasse}} €</span>
-    </div>
-
-    <button class="button" onclick="window.location.reload();">Seite neu laden</button>
+    <h1>Willkommen, {{email}}</h1>
+    <p><strong>Gruppenkasse 2025:</strong> {{gruppenkasse}} €</p>
+    <p><strong>Gruppenfahrt 2025:</strong> {{gruppenfahrt}} €</p>
   </div>
 </body>
 </html>
