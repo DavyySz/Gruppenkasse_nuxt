@@ -134,6 +134,9 @@ app.get('/admin-dashboard', (req, res) => {
   });
 });
 
+
+
+
 // Admin Update (Daten aktualisieren)
 app.post('/admin-update', (req, res) => {
   const updates = req.body;

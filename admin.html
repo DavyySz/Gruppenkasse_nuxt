@@ -2,44 +2,60 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
   <style>
     body {
       font-family: sans-serif;
       background: #f4f4f4;
+      margin: 0;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       height: 100vh;
+      padding: 20px;
     }
+
     .card {
       background: white;
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       text-align: center;
-      width: 80%;
+      width: 100%;
       max-width: 1000px;
+      overflow-x: auto;
     }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
+
     table, th, td {
       border: 1px solid #ddd;
     }
+
     th, td {
-      padding: 8px;
+      padding: 10px;
       text-align: center;
     }
+
     th {
       background-color: #f2f2f2;
     }
+
     input {
       padding: 5px;
-      width: 80px;
+      width: 100px;
+      text-align: center;
     }
+
     button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -48,6 +64,20 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+    
+    @media (max-width: 768px) {
+      .card {
+        padding: 20px;
+      }
+
+      input {
+        width: 80px;
+      }
     }
   </style>
 </head>
@@ -62,8 +92,8 @@
           <th>Gruppenfahrt 2025</th>
         </tr>
       </thead>
-      <tbody>
-        {{users}}
+      <tbody id="user-table">
+        <!-- Dynamische Daten werden hier eingefügt -->
       </tbody>
     </table>
 
@@ -71,7 +101,26 @@
   </div>
 
   <script>
-    // Update die Daten in der Datenbank
+    // Funktion, um die Benutzerdaten zu laden
+    function loadUserData() {
+      fetch('https://gruppetews.ddns.net/admin-users')
+        .then(response => response.json())
+        .then(users => {
+          const userTable = document.getElementById('user-table');
+          users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${user.email}</td>
+              <td><input type="number" id="gruppenkasse_${user.id}" value="${user.gruppenkasse_2025}" /></td>
+              <td><input type="number" id="gruppenfahrt_${user.id}" value="${user.gruppenfahrt_2025}" /></td>
+            `;
+            userTable.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Fehler beim Laden der Daten:', error));
+    }
+
+    // Funktion für die Aktualisierung der Daten in der Datenbank
     function updateData() {
       const updates = [];
       const rows = document.querySelectorAll('tr');
@@ -92,7 +141,7 @@
         }
       });
 
-      fetch('/admin-update', {
+      fetch('https://gruppetews.ddns.net/admin-update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,12 +152,18 @@
       .then(data => {
         if (data.success) {
           alert('Daten erfolgreich aktualisiert!');
+        } else {
+          alert('Fehler beim Aktualisieren der Daten.');
         }
       })
       .catch(error => {
         console.error('Fehler beim Aktualisieren der Daten:', error);
+        alert('Es gab einen Fehler bei der Aktualisierung der Daten.');
       });
     }
+
+    // Lade die Benutzerdaten, wenn die Seite geladen wird
+    window.onload = loadUserData;
   </script>
 </body>
 </html>
