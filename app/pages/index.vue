@@ -57,8 +57,8 @@ const handleSubmit = async () => {
   }
 
   try {
-    // Login-Anfrage an den Backend-Server
-    const res = await fetch('http://gruppetews.ddns.net:8080/login', {
+    // Login-Anfrage an den Backend-Server (mit HTTPS)
+    const res = await fetch('https://gruppetews.ddns.net/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,8 +75,8 @@ const handleSubmit = async () => {
       alert('Login erfolgreich!');
       localStorage.setItem('email', email.value);
 
-      // Anfrage für das Dashboard
-      const dashboardResponse = await fetch('http://gruppetews.ddns.net:8080/secure-dashboard', {
+      // Anfrage für das Dashboard (mit HTTPS)
+      const dashboardResponse = await fetch(`https://gruppetews.ddns.net/secure-dashboard?email=${email.value}`, {
         headers: {
           Authorization: 'Bearer geheim123',
         },
