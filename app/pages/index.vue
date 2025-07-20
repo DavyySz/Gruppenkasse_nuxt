@@ -60,7 +60,7 @@ const handleSubmit = async () => {
 
   try {
     // Login-Anfrage an den Node.js-Server senden
-    const res = await fetch('http://192.168.178.86:8080/login', {
+    const res = await fetch('http://gruppetews.ddns.net:8080/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ const handleSubmit = async () => {
       localStorage.setItem('email', email.value)
 
       // Lade die geschützte HTML-Seite mit dem geheimen Token
-      const dashboardResponse = await fetch('http://192.168.178.86:8080/secure-dashboard', {
+      const dashboardResponse = await fetch('http://gruppetews.ddns.net:8080/secure-dashboard', {
         headers: {
           Authorization: 'Bearer geheim123'
         }
