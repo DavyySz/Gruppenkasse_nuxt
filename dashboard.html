@@ -1,86 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
-
-  <!-- 💄 Einfache Styles für bessere Lesbarkeit -->
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f3f4f6; /* hellgrauer Hintergrund */
-      padding: 2rem;
-      color: #111827; /* dunkle Schrift */
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Schatteneffekt */
-    }
-    h1 {
-      color: #10b981; /* grün */
-    }
-    p {
-      margin-bottom: 1rem;
-    }
-    strong {
-      display: inline-block;
-      width: 200px;
-    }
-  </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>🎉 Willkommen bei der Zahlungsübersicht</h1>
-    <p>Die Beträge für die Gruppenfahrt 2025 werden später eingefügt</p>
-
-    <!-- Hier werden die Daten aus der Datenbank angezeigt -->
-    <p><strong>E-Mail:</strong> <span id="email">Lade...</span></p>
-    <p><strong>Gruppenfahrt 2025:</strong> <span id="fahrt">–</span></p>
-    <p><strong>Gruppenkasse 2025:</strong> <span id="kasse">–</span></p>
-  </div>
-
-  <script>
-    // Sobald die Seite geladen ist:
-    document.addEventListener('DOMContentLoaded', async () => {
-      const email = localStorage.getItem('email') // E-Mail aus localStorage holen
-
-      if (!email) {
-        alert('Keine E-Mail gefunden. Bitte neu einloggen.')
-        return
-      }
-
-      try {
-        // Anfrage an den Node.js-Server, um Nutzerdaten zu laden
-        const res = await fetch('http://gruppetews.ddns.net:8080/userdata', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email }) // E-Mail im Request senden
-        })
-
-        const result = await res.json() // Antwort als JSON lesen
-
-        // Wenn erfolgreich → Daten in HTML schreiben
-        if (result.success) {
-          document.getElementById('email').textContent = result.data.email
-          document.getElementById('fahrt').textContent = result.data.gruppenfahrt_2025 + ' €'
-          document.getElementById('kasse').textContent = result.data.gruppenkasse_2025 + ' €'
-        } else {
-          alert('Fehler beim Laden der Daten: ' + result.message)
-        }
-      } catch (err) {
-        // Wenn der Server nicht erreichbar ist
-        alert('Verbindungsfehler zum Server.')
-        console.error(err)
-      }
-    })
-  </script>
+  <h1>Willkommen auf deinem Dashboard</h1>
+  <p><strong>E-Mail:</strong> {{email}}</p>
+  <p><strong>Gruppenkasse 2025:</strong> {{gruppenkasse_2025}} €</p>
+  <p><strong>Gruppenfahrt 2025:</strong> {{gruppenfahrt_2025}} €</p>
 </body>
 </html>
-
